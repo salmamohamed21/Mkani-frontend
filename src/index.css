@@ -1,0 +1,62 @@
+@tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    :root {
+      --mk-primary: #004aad;
+      --mk-accent: #00aeef;
+    }
+
+    body {
+      @apply bg-gray-50 text-gray-800;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    @keyframes fade-slide {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-slide {
+      animation: fade-slide 1s ease-out both;
+    }
+
+    .rotating-corners {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rotating-corners::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 0 0 100% 0;
+      animation: rotate-corner 2s infinite linear;
+    }
+
+    .rotating-corners::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 100% 0 0 0;
+      animation: rotate-corner 2s infinite linear;
+    }
+
+    @keyframes rotate-corner {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
