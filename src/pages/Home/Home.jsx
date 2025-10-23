@@ -120,7 +120,7 @@ function Home() {
         </div>
 
         {/* Image Section */}
-        <div className="relative w-1/2 h-full">
+        <div className="relative w-1/2 h-full hidden md:block">
           <img
             src={homeImg}
             alt="Mkani Hero"
