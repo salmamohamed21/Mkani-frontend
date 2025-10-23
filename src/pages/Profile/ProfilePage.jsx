@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getProfile, getResidentProfileData, getTechnicianProfileData, getUnionHeadProfileData } from "../../api/auth";
+
+import { getProfile, getResidentProfileData, getUnionHeadProfileData } from "../../api/auth";
 import { getWallet } from "../../api/payments";
 import { getMyBuildings, updateBuilding } from "../../api/buildings.jsx";
 import { useAuth } from "../../context/AuthContext";
@@ -40,7 +41,7 @@ const ProfilePage = () => {
   const [wallet, setWallet] = useState(null);
   const [buildings, setBuildings] = useState([]);
   const [residentData, setResidentData] = useState(null);
-  const [technicianData, setTechnicianData] = useState(null);
+
   const [unionHeadData, setUnionHeadData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedCards, setExpandedCards] = useState({});
@@ -63,10 +64,7 @@ const ProfilePage = () => {
           const residentResponse = await getResidentProfileData();
           setResidentData(residentResponse.data);
         }
-        if (profileResponse.data?.roles?.includes('technician')) {
-          const technicianResponse = await getTechnicianProfileData();
-          setTechnicianData(technicianResponse.data);
-        }
+
         if (profileResponse.data?.roles?.includes('union_head')) {
           const unionHeadResponse = await getUnionHeadProfileData();
           setUnionHeadData(unionHeadResponse.data);
@@ -365,61 +363,7 @@ const ProfilePage = () => {
                 </div>
               )}
 
-              {/* Technician Profile Data */}
-              {profile?.roles?.includes('technician') && technicianData && (
-                <div className="mt-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 bg-orange-100 rounded-full">
-                      <FaTools className="text-2xl text-orange-600" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-800">بيانات الفني</h3>
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl border border-orange-200">
-                      <div className="flex items-center gap-3 mb-3">
-                        <FaTools className="text-orange-600 text-lg" />
-                        <label className="text-sm font-semibold text-gray-700">التخصص</label>
-                      </div>
-                      <p className="text-lg font-bold text-gray-800">{technicianData.specialization}</p>
-                    </div>
-
-                    <div className="p-6 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl border border-red-200">
-                      <div className="flex items-center gap-3 mb-3">
-                        <FaMapMarker className="text-red-600 text-lg" />
-                        <label className="text-sm font-semibold text-gray-700">منطقة العمل</label>
-                      </div>
-                      <p className="text-lg font-bold text-gray-800">{technicianData.work_area}</p>
-                    </div>
-
-                    <div className="p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl border border-yellow-200">
-                      <div className="flex items-center gap-3 mb-3">
-                        <FaUserTag className="text-yellow-600 text-lg" />
-                        <label className="text-sm font-semibold text-gray-700">حالة التوظيف</label>
-                      </div>
-                      <p className="text-lg font-bold text-gray-800">{technicianData.employment_status}</p>
-                    </div>
-
-                    <div className="p-6 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-2xl border border-indigo-200">
-                      <div className="flex items-center gap-3 mb-3">
-                        <FaCoins className="text-indigo-600 text-lg" />
-                        <label className="text-sm font-semibold text-gray-700">السعر</label>
-                      </div>
-                      <p className="text-lg font-bold text-gray-800">{technicianData.rate} جنيه</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-6">
-                    <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200">
-                      <div className="flex items-center gap-3 mb-3">
-                        <FaClipboardList className="text-gray-600 text-lg" />
-                        <label className="text-sm font-semibold text-gray-700">وصف الخدمات</label>
-                      </div>
-                      <p className="text-lg font-bold text-gray-800">{technicianData.services_description}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Buildings Section for Union Head */}
               {profile?.roles?.includes('union_head') && (

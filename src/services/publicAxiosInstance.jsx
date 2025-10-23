@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const publicAxiosInstance = axios.create({
-  baseURL: "http://localhost:8000/",
+  baseURL: "https://terrific-success-production.up.railway.app/api/",
   headers: { "Content-Type": "application/json" },
 });
 

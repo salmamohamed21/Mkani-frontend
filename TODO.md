@@ -1,0 +1,6 @@
+- [ ] Add import for Modal component in Register.jsx
+- [ ] Add state for modal visibility and terms agreement in RegisterStep1
+- [ ] Add checkbox UI with link to open modal after roles selection
+- [ ] Add validation in handleSubmit to check terms agreement
+- [ ] Add Modal component with professional Arabic terms content
+- [ ] Test functionality: modal opens/closes, validation prevents next step if not checked

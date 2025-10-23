@@ -11,13 +11,13 @@ export const MENU_CONFIG = [
     to: "/",
     label: "الرئيسية",
     icon: Home,
-    roles: ["resident", "union_head", "technician", "guest"], // الكل يشوفها
+    roles: ["resident", "union_head", "guest"], // الكل يشوفها
   },
   {
     to: "/profile",
     label: "الملف الشخصي",
     icon: User,
-    roles: ["resident", "union_head", "technician"],
+    roles: ["resident", "union_head"],
   },
 
   {
@@ -36,6 +36,6 @@ export const MENU_CONFIG = [
     to: "/notifications",
     label: "الإشعارات",
     icon: Bell,
-    roles: ["resident", "union_head", "technician"],
+    roles: ["resident", "union_head"],
   },
 ];

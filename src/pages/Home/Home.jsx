@@ -284,30 +284,30 @@ function Home() {
         <div className="py-20 px-5">
           <div className="max-w-7xl mx-auto">
             {/* App Download Banner */}
-            <div className="rounded-3xl p-12 mb-16 shadow-2xl relative overflow-hidden">
-              <div className="relative z-10 flex flex-col items-center gap-8">
-                <div className="flex items-center justify-center gap-6 mb-6">
-                  <div className="text-center lg:text-right">
-                    <h2 className="text-4xl md:text-5xl font-bold text-gray-800 animate-fade-in mb-4">
+            <div className="rounded-3xl p-6 md:p-12 mb-16 shadow-2xl relative overflow-hidden">
+              <div className="relative z-10 flex flex-col items-center gap-6 md:gap-8">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-6">
+                  <div className="text-center md:text-right">
+                    <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-800 animate-fade-in mb-4">
                       حمل تطبيق مكاني الآن!
                     </h2>
-                    <p className="text-xl text-gray-600 leading-relaxed max-w-2xl">
+                    <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl">
                       نظام إدارة العقارات الشامل على الهاتف المحمول - سهولة في الإدارة، كفاءة في الأداء، وتحكم كامل في عقارك من أي مكان
                     </p>
                   </div>
                   <img
                     src={enrollImg}
                     alt="تطبيق مكاني"
-                    className="w-40 h-40 rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300"
+                    className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 flex items-center gap-2">
-                    <FaMobileAlt className="text-lg" />
+                  <button className="px-6 md:px-8 py-3 md:py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 flex items-center gap-2 text-sm md:text-base">
+                    <FaMobileAlt className="text-base md:text-lg" />
                     حمل من Google Play
                   </button>
-                  <button className="px-8 py-4 bg-gray-800 text-white font-bold rounded-xl border-2 border-gray-800 hover:bg-white hover:text-gray-800 transition-all duration-300 flex items-center gap-2">
-                    <FaMobileAlt className="text-lg" />
+                  <button className="px-6 md:px-8 py-3 md:py-4 bg-gray-800 text-white font-bold rounded-xl border-2 border-gray-800 hover:bg-white hover:text-gray-800 transition-all duration-300 flex items-center gap-2 text-sm md:text-base">
+                    <FaMobileAlt className="text-base md:text-lg" />
                     حمل من App Store
                   </button>
                 </div>

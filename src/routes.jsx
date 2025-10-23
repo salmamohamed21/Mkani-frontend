@@ -23,16 +23,13 @@ import AddPackage from './pages/Packages/AddPackage';
 import EditPackage from './pages/Packages/EditPackage';
 import PackageDetails from './pages/Packages/PackageDetails';
 import Wallet from './pages/Payments/Wallet';
-import TopUp from './pages/Payments/TopUp';
-import TransactionHistory from './pages/Payments/TransactionHistory';
-import PayInvoice from './pages/Payments/PayInvoice';
-import AddRequest from './pages/Maintenance/AddRequest';
-import RequestList from './pages/Maintenance/RequestList';
-import TechnicianView from './pages/Maintenance/TechnicianView';
+
+
+
 import Notifications from './pages/Notifications/Notifications';
 import Residents from './pages/Residents/Residents';
 import ResidentDetail from './pages/Residents/ResidentDetail';
-import Settings from './pages/Settings/Settings';
+
 import AddProperty from './pages/AddProperty/AddProperty';
 
 export default function RoutesConfig(){
@@ -60,13 +57,12 @@ export default function RoutesConfig(){
         <Route path="/packages/:id/edit" element={<PrivateRoute><EditPackage /></PrivateRoute>} />
         <Route path="/packages/:id" element={<PrivateRoute><PackageDetails /></PrivateRoute>} />
         <Route path="/payments/wallet" element={<PrivateRoute><Wallet /></PrivateRoute>} />
-        {/* Operational routes removed - moved to mobile app */}
-        <Route path="/maintenance/requests" element={<PrivateRoute><RequestList /></PrivateRoute>} />
-        <Route path="/maintenance/technician" element={<PrivateRoute><TechnicianView /></PrivateRoute>} />
+
+
         <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
         <Route path="/residents" element={<PrivateRoute><Residents /></PrivateRoute>} />
         <Route path="/buildings/:buildingId/residents/:residentId" element={<PrivateRoute><ResidentDetail /></PrivateRoute>} />
-        <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+
         <Route path="/add-property" element={<PrivateRoute><AddProperty /></PrivateRoute>} />
         <Route path="*" element={<Home />} />
       </Routes>

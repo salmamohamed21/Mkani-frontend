@@ -3,19 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import {
   FaUser, FaPhone, FaIdCard, FaBirthdayCake, FaEnvelope, FaLock,
   FaHome, FaUsers, FaUserTie, FaMapMarkerAlt, FaBuilding, FaLayerGroup, FaTh,
-  FaArrowUp, FaBolt, FaTint, FaFileInvoiceDollar, FaFileContract,
-  FaPlus, FaTrash, FaArrowLeft, FaArrowRight, FaTools, FaClock, FaCamera, FaFileAlt,
-  FaFingerprint, FaBriefcase, FaCertificate, FaCheck, FaStepBackward, FaStepForward,
+  FaFileContract,
+  FaArrowRight, FaCheck, FaStepBackward, FaStepForward,
   FaCloudUploadAlt
 } from "react-icons/fa";
 import { registerUserWithFiles } from "../../api/auth";
 import { getPublicBuildingNames } from "../../api/buildings";
 import BuildingLocationPicker from "../../components/register/BuildingLocationPicker";
+import Modal from "../../components/ui/Modal";
 
 const rolesList = [
   { value: "union_head", label: "مالك أو رئيس اتحاد", icon: <FaHome />, color: "from-orange-50 to-orange-100", borderColor: "border-orange-300", textColor: "text-orange-700" },
   { value: "resident", label: "ساكن", icon: <FaUsers />, color: "from-blue-50 to-blue-100", borderColor: "border-blue-300", textColor: "text-blue-700" },
-  { value: "technician", label: "فني صيانة", icon: <FaTools />, color: "from-purple-50 to-purple-100", borderColor: "border-purple-300", textColor: "text-purple-700" },
 ];
 
 const subscriptions = [
@@ -28,6 +27,8 @@ const subscriptions = [
 function RegisterStep1({ onNext, form, setForm }) {
   const [buildings, setBuildings] = useState([]);
   const [passwordErrors, setPasswordErrors] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
@@ -77,6 +78,8 @@ function RegisterStep1({ onNext, form, setForm }) {
     fetchBuildings();
   }, []);
 
+  const isFormValid = form.full_name && form.phone_number && form.national_id && form.date_of_birth && form.email && form.password && form.confirm_password && passwordErrors.length === 0 && form.password === form.confirm_password && form.roles.length > 0 && agreedToTerms;
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.full_name || !form.phone_number || !form.national_id || !form.date_of_birth || !form.email || !form.password) {
@@ -95,15 +98,20 @@ function RegisterStep1({ onNext, form, setForm }) {
       alert("اختر دور واحد على الأقل");
       return;
     }
+    if (!agreedToTerms) {
+      alert("يرجى الموافقة على الشروط والأحكام");
+      return;
+    }
     onNext();
   };
 
   return (
-    <form
-      className="max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8 border border-gray-200"
-      dir="rtl"
-      onSubmit={handleSubmit}
-    >
+    <div>
+      <form
+        className="max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8 border border-gray-200"
+        dir="rtl"
+        onSubmit={handleSubmit}
+      >
       <h2 className="text-2xl font-bold mb-6 text-center">إنشاء حساب جديد</h2>
       <div className="space-y-4">
         {[
@@ -159,10 +167,27 @@ function RegisterStep1({ onNext, form, setForm }) {
         </div>
       </div>
 
-      <button className="w-full bg-cyan-700 text-white py-2 rounded mt-8 hover:bg-cyan-800 transition">
+      <div className="mt-6">
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={agreedToTerms}
+            onChange={(e) => setAgreedToTerms(e.target.checked)}
+            required
+          />
+          <span>أوافق على <button type="button" onClick={() => setIsModalOpen(true)} className="text-cyan-600 underline">الشروط والأحكام</button></span>
+        </label>
+      </div>
+      <button disabled={!isFormValid} className="w-full bg-cyan-700 text-white py-2 rounded mt-8 hover:bg-cyan-800 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
         التالي
       </button>
     </form>
+    <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <h2 className="text-xl font-bold mb-4">الشروط والأحكام</h2>
+      <p>هنا نص الشروط والأحكام...</p>
+      <button onClick={() => setIsModalOpen(false)} className="mt-4 bg-cyan-600 text-white px-4 py-2 rounded">إغلاق</button>
+    </Modal>
+  </div>
   );
 }
 
@@ -184,24 +209,6 @@ function RegisterStep2({ form, setForm, onSubmit, loading, onBack }) {
     rental_contract: null,
     rental_contract_dragOver: false,
     rental_contract_fileName: "",
-
-    specialization: "", work_area: "",
-    employment_status: "", services_description: "",
-    profile_image: null, national_id_front: null, national_id_back: null,
-    selfie_with_id: null, experience_certificates: null, criminal_record: null,
-
-    profile_image_dragOver: false,
-    profile_image_fileName: "",
-    national_id_front_dragOver: false,
-    national_id_front_fileName: "",
-    national_id_back_dragOver: false,
-    national_id_back_fileName: "",
-    selfie_with_id_dragOver: false,
-    selfie_with_id_fileName: "",
-    experience_certificates_dragOver: false,
-    experience_certificates_fileName: "",
-    criminal_record_dragOver: false,
-    criminal_record_fileName: "",
   });
 
   useEffect(() => {
@@ -659,239 +666,7 @@ function RegisterStep2({ form, setForm, onSubmit, loading, onBack }) {
     </div>
   );
 
-  // Render technician form
-  const renderTechnicianForm = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-            <FaBriefcase className="text-purple-600" /> التخصص
-          </label>
-          <select name="specialization" className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-purple-400 focus:outline-none transition-colors" value={extra.specialization} onChange={handleChange} required>
-            <option value="">اختر التخصص</option>
-            <option value="electrician">كهربائي</option>
-            <option value="plumber">سباك</option>
-            <option value="carpenter">نجار</option>
-            <option value="painter">دهان</option>
-            <option value="hvac">تكييف وتبريد</option>
-            <option value="cleaning">تنظيف</option>
-            <option value="other">أخرى</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-            <FaMapMarkerAlt className="text-purple-600" /> منطقة التغطية
-          </label>
-          <input type="text" name="work_area" placeholder="مثال: القاهرة, الجيزة" className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-purple-400 focus:outline-none transition-colors" value={extra.work_area} onChange={handleChange} required />
-        </div>
-
-        <div>
-          <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-            <FaFileInvoiceDollar className="text-purple-600" /> سعر الخدمة
-          </label>
-          <input type="number" name="rate" className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-purple-400 focus:outline-none transition-colors" value={extra.rate} onChange={handleChange} required />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-            <FaBriefcase className="text-purple-600" /> حالة التوظيف
-          </label>
-          <select name="employment_status" className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-purple-400 focus:outline-none transition-colors" value={extra.employment_status} onChange={handleChange} required>
-            <option value="">اختر حالة التوظيف</option>
-            <option value="freelancer">مستقل</option>
-            <option value="company_employee">موظف بشركة</option>
-            <option value="business_owner">صاحب عمل</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-          <FaFileAlt className="text-purple-600" /> وصف الخدمات والخبرة
-        </label>
-        <textarea name="services_description" rows="4" className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-purple-400 focus:outline-none transition-colors" value={extra.services_description} onChange={handleChange} placeholder="اكتب وصفاً مفصلاً عن خبرتك وخدماتك..." required></textarea>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div>
-          <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-            <FaCamera className="text-purple-600" /> الصورة الشخصية
-          </label>
-          <div
-            onDragOver={handleProfileImageDragOver}
-            onDragLeave={handleProfileImageDragLeave}
-            onDrop={handleProfileImageDrop}
-            onClick={() => document.getElementById("profileImageInput").click()}
-            className={`w-full p-6 border-2 rounded-lg text-right cursor-pointer flex flex-col items-center justify-center gap-3 transition-colors
-              ${extra.profile_image_dragOver ? "border-cyan-600 bg-cyan-50" : "border-gray-200 bg-white hover:border-purple-400"}`}
-          >
-            <FaCloudUploadAlt className="text-cyan-600 text-4xl" />
-            <p className="text-gray-600">اسحب الملف هنا أو اضغط للاختيار</p>
-            {extra.profile_image_fileName && (
-              <p className="text-cyan-700 font-semibold truncate max-w-full">{extra.profile_image_fileName}</p>
-            )}
-            <input
-              type="file"
-              id="profileImageInput"
-              name="profile_image"
-              accept=".jpg,.jpeg,.png"
-              onChange={handleFile}
-              className="hidden"
-              required
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-            <FaIdCard className="text-purple-600" /> صورة البطاقة الأمامية
-          </label>
-          <div
-            onDragOver={handleNationalIdFrontDragOver}
-            onDragLeave={handleNationalIdFrontDragLeave}
-            onDrop={handleNationalIdFrontDrop}
-            onClick={() => document.getElementById("nationalIdFrontInput").click()}
-            className={`w-full p-6 border-2 rounded-lg text-right cursor-pointer flex flex-col items-center justify-center gap-3 transition-colors
-              ${extra.national_id_front_dragOver ? "border-cyan-600 bg-cyan-50" : "border-gray-200 bg-white hover:border-purple-400"}`}
-          >
-            <FaCloudUploadAlt className="text-cyan-600 text-4xl" />
-            <p className="text-gray-600">اسحب الملف هنا أو اضغط للاختيار</p>
-            {extra.national_id_front_fileName && (
-              <p className="text-cyan-700 font-semibold truncate max-w-full">{extra.national_id_front_fileName}</p>
-            )}
-            <input
-              type="file"
-              id="nationalIdFrontInput"
-              name="national_id_front"
-              accept=".jpg,.jpeg,.png"
-              onChange={handleFile}
-              className="hidden"
-              required
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-            <FaIdCard className="text-purple-600" /> صورة البطاقة الخلفية
-          </label>
-          <div
-            onDragOver={handleNationalIdBackDragOver}
-            onDragLeave={handleNationalIdBackDragLeave}
-            onDrop={handleNationalIdBackDrop}
-            onClick={() => document.getElementById("nationalIdBackInput").click()}
-            className={`w-full p-6 border-2 rounded-lg text-right cursor-pointer flex flex-col items-center justify-center gap-3 transition-colors
-              ${extra.national_id_back_dragOver ? "border-cyan-600 bg-cyan-50" : "border-gray-200 bg-white hover:border-purple-400"}`}
-          >
-            <FaCloudUploadAlt className="text-cyan-600 text-4xl" />
-            <p className="text-gray-600">اسحب الملف هنا أو اضغط للاختيار</p>
-            {extra.national_id_back_fileName && (
-              <p className="text-cyan-700 font-semibold truncate max-w-full">{extra.national_id_back_fileName}</p>
-            )}
-            <input
-              type="file"
-              id="nationalIdBackInput"
-              name="national_id_back"
-              accept=".jpg,.jpeg,.png"
-              onChange={handleFile}
-              className="hidden"
-              required
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-            <FaFingerprint className="text-purple-600" /> سيلفي مع البطاقة
-          </label>
-          <div
-            onDragOver={handleSelfieWithIdDragOver}
-            onDragLeave={handleSelfieWithIdDragLeave}
-            onDrop={handleSelfieWithIdDrop}
-            onClick={() => document.getElementById("selfieWithIdInput").click()}
-            className={`w-full p-6 border-2 rounded-lg text-right cursor-pointer flex flex-col items-center justify-center gap-3 transition-colors
-              ${extra.selfie_with_id_dragOver ? "border-cyan-600 bg-cyan-50" : "border-gray-200 bg-white hover:border-purple-400"}`}
-          >
-            <FaCloudUploadAlt className="text-cyan-600 text-4xl" />
-            <p className="text-gray-600">اسحب الملف هنا أو اضغط للاختيار</p>
-            {extra.selfie_with_id_fileName && (
-              <p className="text-cyan-700 font-semibold truncate max-w-full">{extra.selfie_with_id_fileName}</p>
-            )}
-            <input
-              type="file"
-              id="selfieWithIdInput"
-              name="selfie_with_id"
-              accept=".jpg,.jpeg,.png"
-              onChange={handleFile}
-              className="hidden"
-              required
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-            <FaCertificate className="text-purple-600" /> شهادات الخبرة
-          </label>
-          <div
-            onDragOver={handleExperienceCertificatesDragOver}
-            onDragLeave={handleExperienceCertificatesDragLeave}
-            onDrop={handleExperienceCertificatesDrop}
-            onClick={() => document.getElementById("experienceCertificatesInput").click()}
-            className={`w-full p-6 border-2 rounded-lg text-right cursor-pointer flex flex-col items-center justify-center gap-3 transition-colors
-              ${extra.experience_certificates_dragOver ? "border-cyan-600 bg-cyan-50" : "border-gray-200 bg-white hover:border-purple-400"}`}
-          >
-            <FaCloudUploadAlt className="text-cyan-600 text-4xl" />
-            <p className="text-gray-600">اسحب الملف هنا أو اضغط للاختيار</p>
-            {extra.experience_certificates_fileName && (
-              <p className="text-cyan-700 font-semibold truncate max-w-full">{extra.experience_certificates_fileName}</p>
-            )}
-            <input
-              type="file"
-              id="experienceCertificatesInput"
-              name="experience_certificates"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={handleFile}
-              className="hidden"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-            <FaFileAlt className="text-purple-600" /> شهادة فيش جنائى
-          </label>
-          <div
-            onDragOver={handleCriminalRecordDragOver}
-            onDragLeave={handleCriminalRecordDragLeave}
-            onDrop={handleCriminalRecordDrop}
-            onClick={() => document.getElementById("criminalRecordInput").click()}
-            className={`w-full p-6 border-2 rounded-lg text-right cursor-pointer flex flex-col items-center justify-center gap-3 transition-colors
-              ${extra.criminal_record_dragOver ? "border-cyan-600 bg-cyan-50" : "border-gray-200 bg-white hover:border-purple-400"}`}
-          >
-            <FaCloudUploadAlt className="text-cyan-600 text-4xl" />
-            <p className="text-gray-600">اسحب الملف هنا أو اضغط للاختيار</p>
-            {extra.criminal_record_fileName && (
-              <p className="text-cyan-700 font-semibold truncate max-w-full">{extra.criminal_record_fileName}</p>
-            )}
-            <input
-              type="file"
-              id="criminalRecordInput"
-              name="criminal_record"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={handleFile}
-              className="hidden"
-              required
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
+  
   return (
     <div className="max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8" dir="rtl">
       <div className="mb-6">
@@ -916,7 +691,6 @@ function RegisterStep2({ form, setForm, onSubmit, loading, onBack }) {
       <form onSubmit={handleSubmit} className="space-y-6">
         {currentRole === 'union_head' && renderOwnerForm()}
         {currentRole === 'resident' && renderResidentForm()}
-        {currentRole === 'technician' && renderTechnicianForm()}
 
         <div className="flex justify-between pt-6">
           <button
@@ -1010,20 +784,7 @@ export default function RegisterPage() {
           }
         }
 
-        if (data.roles.includes('technician')) {
-          formData.append('specialization', data.specialization);
-          formData.append('work_area', data.work_area);
-          formData.append('rate', data.rate);
-          formData.append('employment_status', data.employment_status);
-          formData.append('services_description', data.services_description);
-          formData.append('profile_image', data.profile_image);
-          formData.append('national_id_front', data.national_id_front);
-          formData.append('national_id_back', data.national_id_back);
-          formData.append('selfie_with_id', data.selfie_with_id);
-          formData.append('experience_certificates', data.experience_certificates);
-          formData.append('criminal_record', data.criminal_record);
-        }
-
+        
         const response = await registerUserWithFiles(formData);
 
         setSuccess('تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول و التوجهه لصفحه تسجيل الدخول');
