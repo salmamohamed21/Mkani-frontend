@@ -86,31 +86,40 @@ function Home() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-50" dir="rtl">
       {/* Hero Section */}
       <section
-        className="relative w-full h-[400px] md:h-[450px] rounded-2xl overflow-hidden flex shadow-lg bg-gradient-to-b from-[#6a67ce] to-[#1b173b] mx-5 mt-5"
+        className="relative w-full h-[400px] md:h-[450px] rounded-2xl overflow-hidden flex flex-col md:flex-row shadow-lg bg-gradient-to-b from-[#6a67ce] to-[#1b173b] mx-4 md:mx-5 mt-5"
         dir="rtl"
       >
-        {/* Left side: Text */}
-        <div className="w-1/2 relative bg-gradient-to-b from-[#6a67ce] to-[#1b173b] flex flex-col justify-center items-center text-white text-center px-6">
+        {/* Background Image for Small Screens */}
+        <div
+          className="absolute inset-0 bg-cover bg-center md:hidden"
+          style={{ backgroundImage: `url(${homeImg})` }}
+        ></div>
+
+        {/* Dark Overlay for Small Screens */}
+        <div className="absolute inset-0 bg-black bg-opacity-50 md:hidden"></div>
+
+        {/* Text Section */}
+        <div className="w-full md:w-1/2 relative md:bg-gradient-to-b from-[#6a67ce] to-[#1b173b] flex flex-col justify-center items-center text-white text-center px-4 md:px-6 py-8 md:py-0 order-last md:order-first mt-auto md:mt-0">
           <div className="relative z-10 animate-fade-slide">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 drop-shadow-md">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 drop-shadow-md">
               مسكن أفضل لحياة أسعد
             </h1>
-            <p className="text-lg md:text-xl mb-6 opacity-90">
+            <p className="text-base md:text-lg lg:text-xl mb-6 opacity-90">
               كل ما يخص مسكنك في مكان واحد!
             </p>
             {!user && (
               <button
                 onClick={() => navigate("/register")}
-                className="mx-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 flex items-center gap-2"
+                className="mx-auto px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 flex items-center gap-2 text-sm md:text-base"
               >
-                <FaStar className="text-lg" />
+                <FaStar className="text-base md:text-lg" />
                 ابدء رحلتك الان
               </button>
             )}
           </div>
         </div>
 
-        {/* Right side: Image */}
+        {/* Image Section */}
         <div className="relative w-1/2 h-full">
           <img
             src={homeImg}
