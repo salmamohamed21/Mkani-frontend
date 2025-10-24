@@ -13,7 +13,7 @@ export function getBuildings() {
 
 export function getPublicBuildingNames() {
   return publicAxiosInstance
-    .get("api/public/building-names/")
+    .get("public/building-names/")
     .then((response) => response.data)
     .catch((error) => {
       console.error("Error fetching public building names:", error);
