@@ -15,7 +15,7 @@ export const registerUser = async (data) => {
 };
 
 export const registerUserWithFiles = async (formData) => {
-  const res = await axiosClient.post('/api/accounts/register/', formData, {
+  const res = await axiosClient.post('/accounts/register/', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
