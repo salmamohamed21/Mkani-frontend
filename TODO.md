@@ -1,6 +1,6 @@
-- [ ] Add import for Modal component in Register.jsx
-- [ ] Add state for modal visibility and terms agreement in RegisterStep1
-- [ ] Add checkbox UI with link to open modal after roles selection
-- [ ] Add validation in handleSubmit to check terms agreement
-- [ ] Add Modal component with professional Arabic terms content
-- [ ] Test functionality: modal opens/closes, validation prevents next step if not checked
+- [x] Modify App.jsx to hide sidebar on home page for all users
+- [x] Import useLocation hook in App.jsx
+- [x] Update showSidebar logic to exclude home page ("/")
+- [x] Adjust margin logic to not apply when sidebar is hidden
+- [x] Test that sidebar appears on other pages for authenticated users
+- [x] Ensure home page has full width for all users
