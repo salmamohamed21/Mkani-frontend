@@ -115,19 +115,22 @@ function RegisterStep1({ onNext, form, setForm }) {
       <h2 className="text-2xl font-bold mb-6 text-center">إنشاء حساب جديد</h2>
       <div className="space-y-4">
         {[
-          { name: "full_name", type: "text", placeholder: "الاسم بالكامل", icon: <FaUser /> },
-          { name: "phone_number", type: "tel", placeholder: "رقم الهاتف", icon: <FaPhone /> },
-          { name: "national_id", type: "text", placeholder: "الرقم القومي", icon: <FaIdCard /> },
-          { name: "date_of_birth", type: "date", placeholder: "", icon: <FaBirthdayCake /> },
-          { name: "email", type: "email", placeholder: "البريد الإلكتروني", icon: <FaEnvelope /> },
-          { name: "password", type: "password", placeholder: "كلمة المرور", icon: <FaLock /> },
-          { name: "confirm_password", type: "password", placeholder: "تأكيد كلمة المرور", icon: <FaLock /> },
+          { name: "full_name", type: "text", placeholder: "الاسم بالكامل", icon: <FaUser />, label: "الاسم بالكامل", autocomplete: "name" },
+          { name: "phone_number", type: "tel", placeholder: "رقم الهاتف", icon: <FaPhone />, label: "رقم الهاتف", autocomplete: "tel" },
+          { name: "national_id", type: "text", placeholder: "الرقم القومي", icon: <FaIdCard />, label: "الرقم القومي", autocomplete: "off" },
+          { name: "date_of_birth", type: "date", placeholder: "", icon: <FaBirthdayCake />, label: "تاريخ الميلاد", autocomplete: "bday" },
+          { name: "email", type: "email", placeholder: "البريد الإلكتروني", icon: <FaEnvelope />, label: "البريد الإلكتروني", autocomplete: "email" },
+          { name: "password", type: "password", placeholder: "كلمة المرور", icon: <FaLock />, label: "كلمة المرور", autocomplete: "new-password" },
+          { name: "confirm_password", type: "password", placeholder: "تأكيد كلمة المرور", icon: <FaLock />, label: "تأكيد كلمة المرور", autocomplete: "new-password" },
         ].map((field, idx) => (
           <div key={idx} className="flex items-center border-b flex-row-reverse">
+            <label htmlFor={field.name} className="sr-only">{field.label}</label>
             <input
               type={field.type}
+              id={field.name}
               name={field.name}
               placeholder={field.placeholder}
+              autoComplete={field.autocomplete}
               className="w-full p-2 outline-none text-right"
               value={form[field.name]}
               onChange={handleChange}
