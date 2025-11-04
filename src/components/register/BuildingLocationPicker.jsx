@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 // أيقونة مخصصة للموقع
 const markerIcon = new L.Icon({
@@ -59,7 +60,7 @@ const fetchCoords = async (manualAddress, setPosition, setAddress, setWarningMes
   }
   try {
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(manualAddress)}`
+      `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1&countrycodes=eg&accept-language=ar,en&q=${encodeURIComponent(manualAddress)}`
     );
     const data = await res.json();
     if (data.length > 0) {
@@ -68,13 +69,13 @@ const fetchCoords = async (manualAddress, setPosition, setAddress, setWarningMes
       setPosition(coords);
       fetchAddress(coords, setAddress, onLocationSelect);
     } else {
-      setWarningMessage("العنوان المدخل غير موجود على الخريطة. يرجى التأكد من صحة العنوان أو اختيار موقع آخر.");
+      setWarningMessage("عذرًا، لم نتمكن من العثور على العنوان الذي أدخلته على الخريطة. يرجى التأكد من صحة العنوان أو كتابته بمزيد من التفاصيل للحصول على نتائج أفضل.");
       setPosition(null);
       setAddress("");
     }
   } catch (err) {
     console.error("❌ فشل في تحديد الإحداثيات من العنوان:", err);
-    setWarningMessage("حدث خطأ في البحث عن العنوان. يرجى المحاولة مرة أخرى.");
+    setWarningMessage("عذرًا، حدث خطأ أثناء البحث عن العنوان. يرجى المحاولة مرة أخرى لاحقًا.");
   }
 };
 
@@ -84,20 +85,9 @@ const BuildingLocationPicker = ({ onLocationSelect, initialAddress = "" }) => {
   const [manualAddress, setManualAddress] = useState(initialAddress);
   const [warningMessage, setWarningMessage] = useState("");
 
-  // عند كتابة العنوان يدويًا، ابحث عنه على الخريطة
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchCoords(manualAddress, setPosition, setAddress, setWarningMessage, onLocationSelect);
-    }, 1000); // تأخير لتجنب الطلبات المتكررة
-    return () => clearTimeout(timer);
-  }, [manualAddress, onLocationSelect]);
 
-  // تمرير النتيجة للفورم الرئيسي
-  useEffect(() => {
-    if (manualAddress) {
-      onLocationSelect({ position, address: manualAddress, manualAddress });
-    }
-  }, [position, manualAddress, address]);
+
+
 
   return (
     <div className="space-y-4 bg-white p-4 rounded-xl shadow-md">
@@ -110,13 +100,21 @@ const BuildingLocationPicker = ({ onLocationSelect, initialAddress = "" }) => {
         <label className="block text-sm font-medium text-gray-700 mb-1">
           العنوان يدويًا:
         </label>
-        <input
-          type="text"
-          placeholder="اكتب العنوان أو اسم المنطقة..."
-          value={manualAddress}
-          onChange={(e) => setManualAddress(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        />
+        <div className="flex">
+          <input
+            type="text"
+            placeholder="اكتب العنوان أو اسم المنطقة..."
+            value={manualAddress}
+            onChange={(e) => setManualAddress(e.target.value)}
+            className="flex-1 border border-gray-300 rounded-l-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          />
+          <button
+            onClick={() => fetchCoords(manualAddress, setPosition, setAddress, setWarningMessage, onLocationSelect)}
+            className="bg-gray-500 text-white px-3 py-2 mr-3 rounded-tr-2xl rounded-bl-2xl hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 flex items-center justify-center transition-colors duration-200"
+          >
+            <MagnifyingGlassIcon className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       {/* خريطة OpenStreetMap */}

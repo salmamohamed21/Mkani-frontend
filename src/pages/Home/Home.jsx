@@ -86,7 +86,7 @@ function Home() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-50" dir="rtl">
       {/* Hero Section */}
       <section
-        className="relative w-full h-[400px] md:h-[450px] rounded-2xl overflow-hidden flex flex-col md:flex-row shadow-lg bg-gradient-to-b from-[#6a67ce] to-[#1b173b] mx-4 md:mx-5 mt-5"
+        className="relative w-full h-[400px] md:h-[450px] rounded-2xl overflow-hidden flex flex-col md:flex-row shadow-lg bg-gradient-to-b from-[#6a67ce] to-[#1b173b] mx-0 mt-5"
         dir="rtl"
       >
         {/* Background Image for Small Screens */}
@@ -110,7 +110,7 @@ function Home() {
             {!user && (
               <button
                 onClick={() => navigate("/register")}
-                className="mx-auto px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 flex items-center gap-2 text-sm md:text-base"
+                className="mx-auto px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-tr-3xl rounded-bl-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 flex items-center gap-2 text-sm md:text-base"
               >
                 <FaStar className="text-base md:text-lg" />
                 ابدء رحلتك الان

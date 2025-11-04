@@ -59,3 +59,8 @@ export const updateProfile = (data) => AuthAPI.updateProfile(data);
 export const getResidentProfileData = () => axiosClient.get("/api/auth/profile/resident-data/");
 export const getTechnicianProfileData = () => axiosClient.get("/api/auth/profile/technician-data/");
 export const getUnionHeadProfileData = () => axiosClient.get("/api/auth/profile/union-head-data/");
+
+export const searchByNationalId = async (nationalId) => {
+  const res = await axiosClient.get(`/api/accounts/search-by-national-id/${nationalId}/`);
+  return res.data;
+};

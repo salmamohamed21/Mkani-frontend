@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import {
   FaUser, FaPhone, FaIdCard, FaBirthdayCake, FaEnvelope, FaLock,
   FaHome, FaUsers, FaUserTie, FaMapMarkerAlt, FaBuilding, FaLayerGroup, FaTh,
-  FaFileContract,
+  FaCalendarAlt, FaMoneyBillWave, FaClock,
   FaArrowRight, FaCheck, FaStepBackward, FaStepForward,
-  FaCloudUploadAlt
+  FaSearch
 } from "react-icons/fa";
-import { registerUserWithFiles } from "../../api/auth";
+import { registerUserWithFiles, searchByNationalId } from "../../api/auth";
 import { getPublicBuildingNames } from "../../api/buildings";
 import BuildingLocationPicker from "../../components/register/BuildingLocationPicker";
 import Modal from "../../components/ui/Modal";
@@ -15,6 +15,11 @@ import Modal from "../../components/ui/Modal";
 const rolesList = [
   { value: "union_head", label: "مالك أو رئيس اتحاد", icon: <FaHome />, color: "from-orange-50 to-orange-100", borderColor: "border-orange-300", textColor: "text-orange-700" },
   { value: "resident", label: "ساكن", icon: <FaUsers />, color: "from-blue-50 to-blue-100", borderColor: "border-blue-300", textColor: "text-blue-700" },
+];
+
+const residentTypes = [
+  { value: "owner", label: "مالك", icon: <FaHome />, color: "from-blue-50 to-blue-100", borderColor: "border-blue-300", textColor: "text-blue-700" },
+  { value: "tenant", label: "مستأجر", icon: <FaUserTie />, color: "from-green-50 to-green-100", borderColor: "border-green-300", textColor: "text-green-700" },
 ];
 
 const subscriptions = [
@@ -204,15 +209,21 @@ function RegisterStep2({ form, setForm, onSubmit, loading, onBack }) {
     total_units: "", total_floors: "", units_per_floor: "",
     subscription_plan: "",
 
-    resident_type: "owner",
     building: form.building, is_other: false, manual_building_name: "", manual_address: "",
     address: "",
     floor_number: "", apartment_number: "",
+    useSameAddressAsUnionHead: false,
 
-    rental_contract: null,
-    rental_contract_dragOver: false,
-    rental_contract_fileName: "",
+    resident_type: "",
+
+    rental_start_date: "",
+    rental_end_date: "",
+    rental_value: "",
+
+    owner_national_id: "",
   });
+  const [verificationResult, setVerificationResult] = useState(null);
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     const fetchBuildings = async () => {
@@ -436,7 +447,7 @@ function RegisterStep2({ form, setForm, onSubmit, loading, onBack }) {
     }
 
     if (currentRole === 'resident') {
-      if (!extra.building) {
+      if (!extra.useSameAddressAsUnionHead && !extra.building) {
         alert("يرجى اختيار عمارة.");
         return;
       }
@@ -452,15 +463,21 @@ function RegisterStep2({ form, setForm, onSubmit, loading, onBack }) {
     }
 
     if (currentRole === 'resident') {
-      if (extra.building !== 'other') {
-        const building = buildings.find(b => b.id === extra.building);
-        if (building) {
-          updatedExtra.building_name = building.name;
-          updatedExtra.address = `${building.province}, ${building.city}, ${building.district}, ${building.street}`;
-        }
+      if (extra.useSameAddressAsUnionHead) {
+        updatedExtra.address = `${extra.province}, ${extra.city}, ${extra.district}, ${extra.street}`;
+        updatedExtra.building_name = extra.name;
+        updatedExtra.building_id = null;
       } else {
-        updatedExtra.building_name = extra.manual_building_name;
-        updatedExtra.address = extra.manual_address;
+        if (extra.building !== 'other') {
+          const building = buildings.find(b => b.id === extra.building);
+          if (building) {
+            updatedExtra.building_name = building.name;
+            updatedExtra.address = `${building.province}, ${building.city}, ${building.district}, ${building.street}`;
+          }
+        } else {
+          updatedExtra.building_name = extra.manual_building_name;
+          updatedExtra.address = extra.manual_address;
+        }
       }
     }
 
@@ -558,6 +575,8 @@ function RegisterStep2({ form, setForm, onSubmit, loading, onBack }) {
           ))}
         </div>
       </div>
+
+
     </div>
   );
 
@@ -565,53 +584,75 @@ function RegisterStep2({ form, setForm, onSubmit, loading, onBack }) {
   const renderResidentForm = () => (
     <div className="space-y-6">
       <div>
-        <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-          <FaUserTie className="text-blue-600" /> نوع السكن
-        </label>
-        <select name="resident_type" value={extra.resident_type} onChange={handleChange} className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors" required>
-          <option value="owner">مالك</option>
-          <option value="tenant">مستأجر</option>
-        </select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {residentTypes.map((type) => (
+            <label key={type.value} className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all ${extra.resident_type === type.value ? `${type.borderColor} bg-gradient-to-r ${type.color}` : 'border-gray-200 hover:border-blue-300'}`}>
+              <input type="radio" name="resident_type" value={type.value} checked={extra.resident_type === type.value} onChange={handleChange} className="sr-only" required />
+              <div className={`flex items-center gap-2 ${type.textColor}`}>
+                {type.icon}
+                <div className="font-semibold">{type.label}</div>
+              </div>
+            </label>
+          ))}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="md:col-span-2">
-          <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-            <FaBuilding className="text-blue-600" /> اختر العمارة
+      {roles.includes('union_head') && (
+        <div>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="useSameAddressAsUnionHead"
+              checked={extra.useSameAddressAsUnionHead}
+              onChange={handleChange}
+            />
+            <span>العنوان مطابق لعنوان الذى تم ادخاله فى بيانات رئيس الاتحاد</span>
           </label>
-          <select name="building" value={extra.building} onChange={handleChange} required className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors">
-            <option value="">اختر العمارة</option>
-            {buildings.map(building => (
-              <option key={building.id} value={building.id}>{building.name} - {building.address}</option>
-            ))}
-            <option value="other">أخرى</option>
-          </select>
-          {extra.building === 'other' && (
-            <div className="mt-4 space-y-4">
-              <div>
-                <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-                  <FaBuilding className="text-blue-600" /> اسم العمارة
-                </label>
-                <input type="text" name="manual_building_name" placeholder="اسم العمارة" className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors" value={extra.manual_building_name} onChange={handleChange} required />
-              </div>
-              <div>
-                <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-                  <FaMapMarkerAlt className="text-blue-600" /> العنوان
-                </label>
-                <BuildingLocationPicker
-                  onLocationSelect={(locationData) => {
-                    setExtra((prev) => ({
-                      ...prev,
-                      manual_address: locationData.address,
-                    }));
-                  }}
-                  initialAddress={extra.manual_address}
-                />
-              </div>
-            </div>
-          )}
         </div>
+      )}
 
+      {!extra.useSameAddressAsUnionHead && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="md:col-span-2">
+            <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
+              <FaBuilding className="text-blue-600" /> اختر العمارة
+            </label>
+            <select name="building" value={extra.building} onChange={handleChange} required className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors">
+              <option value="">اختر العمارة</option>
+              {buildings.map(building => (
+                <option key={building.id} value={building.id}>{building.name} - {building.address}</option>
+              ))}
+              <option value="other">أخرى</option>
+            </select>
+            {extra.building === 'other' && (
+              <div className="mt-4 space-y-4">
+                <div>
+                  <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
+                    <FaBuilding className="text-blue-600" /> اسم العمارة
+                  </label>
+                  <input type="text" name="manual_building_name" placeholder="اسم العمارة" className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors" value={extra.manual_building_name} onChange={handleChange} required />
+                </div>
+                <div>
+                  <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
+                    <FaMapMarkerAlt className="text-blue-600" /> العنوان
+                  </label>
+                  <BuildingLocationPicker
+                    onLocationSelect={(locationData) => {
+                      setExtra((prev) => ({
+                        ...prev,
+                        manual_address: locationData.address,
+                      }));
+                    }}
+                    initialAddress={extra.manual_address}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
             <FaLayerGroup className="text-blue-600" /> رقم الدور
@@ -627,42 +668,128 @@ function RegisterStep2({ form, setForm, onSubmit, loading, onBack }) {
         </div>
       </div>
 
-      {extra.resident_type === 'tenant' && (
+      {extra.resident_type === 'owner' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
-              <FaFileContract className="text-blue-600" /> عقد الإيجار
+              <FaHome className="text-blue-600" /> مساحة الشقة (متر مربع)
             </label>
-            <div
-              onDragOver={handleRentalDragOver}
-              onDragLeave={handleRentalDragLeave}
-              onDrop={handleRentalDrop}
-              onClick={() => document.getElementById("rentalContractInput").click()}
-              className={`w-full p-6 border-2 rounded-lg text-right cursor-pointer flex flex-col items-center justify-center gap-3 transition-colors
-                ${extra.rental_contract_dragOver ? "border-cyan-600 bg-cyan-50" : "border-gray-200 bg-white hover:border-blue-400"}`}
-            >
-              <FaCloudUploadAlt className="text-cyan-600 text-4xl" />
-              <p className="text-gray-600">اسحب الملف هنا أو اضغط للاختيار</p>
-              {extra.rental_contract_fileName && (
-                <p className="text-cyan-700 font-semibold truncate max-w-full">{extra.rental_contract_fileName}</p>
-              )}
-              <input
-                type="file"
-                id="rentalContractInput"
-                name="rental_contract"
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={handleFile}
-                className="hidden"
-                required
-              />
-            </div>
+            <input type="number" name="area" step="0.01" className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors" value={extra.area} onChange={handleChange} required />
           </div>
 
           <div>
             <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
+              <FaTh className="text-blue-600" /> عدد الغرف
+            </label>
+            <input type="number" name="rooms_count" className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors" value={extra.rooms_count} onChange={handleChange} required />
+          </div>
+        </div>
+      )}
+
+      {extra.resident_type === 'tenant' && (
+        <div className="space-y-6">
+          <div>
+            <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
               <FaIdCard className="text-blue-600" /> الرقم القومي للمالك
             </label>
-            <input type="text" name="owner_national_id" className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors" value={extra.owner_national_id} onChange={handleChange} required />
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                name="owner_national_id"
+                placeholder="أدخل الرقم القومي"
+                className="flex-1 p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors"
+                value={extra.owner_national_id}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!extra.owner_national_id.trim()) {
+                    alert("يرجى إدخال الرقم القومي أولاً");
+                    return;
+                  }
+                  setVerifying(true);
+                  try {
+                    const result = await searchByNationalId(extra.owner_national_id);
+                    setVerificationResult({
+                      full_name: result.full_name,
+                      phone_number: result.phone_number,
+                      message: "تم العثور على المالك"
+                    });
+                  } catch (error) {
+                    setVerificationResult({
+                      message: "المالك غير منضم إلينا، يجب دعوته للانضمام إلى مجتمع مكاني"
+                    });
+                  } finally {
+                    setVerifying(false);
+                  }
+                }}
+                className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                disabled={verifying}
+              >
+                {verifying ? <FaClock className="animate-spin" /> : <FaCheck />}
+                {verifying ? "جاري التحقق..." : "تحقق"}
+              </button>
+            </div>
+            {verificationResult && (
+              <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                {verificationResult.full_name ? (
+                  <div className="text-right">
+                    <p className="font-semibold text-green-700">{verificationResult.message}</p>
+                    <p><strong>الاسم:</strong> {verificationResult.full_name}</p>
+                    <p><strong>رقم الهاتف:</strong> {verificationResult.phone_number}</p>
+                  </div>
+                ) : (
+                  <p className="text-red-700">{verificationResult.message}</p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
+                <FaCalendarAlt className="text-blue-600" /> ابتداء من
+              </label>
+              <input
+                type="date"
+                name="rental_start_date"
+                className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors"
+                value={extra.rental_start_date}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
+                <FaCalendarAlt className="text-blue-600" /> انتهاء في
+              </label>
+              <input
+                type="date"
+                name="rental_end_date"
+                className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors"
+                value={extra.rental_end_date}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-3 font-semibold text-right flex items-center gap-2 text-gray-700">
+                <FaMoneyBillWave className="text-blue-600" /> قيمة الإيجار
+              </label>
+              <input
+                type="number"
+                name="rental_value"
+                placeholder="قيمة الإيجار بالجنيه"
+                className="w-full p-3 border-2 border-gray-200 rounded-lg text-right focus:border-blue-400 focus:outline-none transition-colors"
+                value={extra.rental_value}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
         </div>
       )}
