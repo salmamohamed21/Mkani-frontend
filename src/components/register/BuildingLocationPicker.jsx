@@ -84,6 +84,22 @@ const BuildingLocationPicker = ({ onLocationSelect, initialAddress = "" }) => {
   const [address, setAddress] = useState("");
   const [manualAddress, setManualAddress] = useState(initialAddress);
   const [warningMessage, setWarningMessage] = useState("");
+  const [mapCenter, setMapCenter] = useState([30.0444, 31.2357]); // Default to Cairo
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setMapCenter([latitude, longitude]);
+        },
+        (error) => {
+          console.warn("Geolocation error:", error);
+          // Keep default Cairo center
+        }
+      );
+    }
+  }, []);
 
 
 
@@ -120,7 +136,7 @@ const BuildingLocationPicker = ({ onLocationSelect, initialAddress = "" }) => {
       {/* خريطة OpenStreetMap */}
       <div className="h-72 rounded-xl overflow-hidden border border-gray-200 relative z-0">
         <MapContainer
-          center={[30.0444, 31.2357]} // القاهرة كموقع افتراضي
+          center={mapCenter}
           zoom={13}
           style={{ height: '100%', width: '100%', zIndex: 1 }}
         >

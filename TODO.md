@@ -1,4 +1,1 @@
-- [ ] Add useSameAddressAsUnionHead to extra state in RegisterStep2
-- [ ] Add checkbox in renderResidentForm when both roles selected
-- [ ] Conditionally hide BuildingLocationPicker and manual address inputs when checkbox checked
-- [ ] Update handleSubmit to set resident address from union_head data when checkbox checked
+- [x] Update BuildingLocationPicker.jsx to set default map center to user's device location using geolocation API
