@@ -44,6 +44,7 @@ const ProfilePage = () => {
 
   const [unionHeadData, setUnionHeadData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState({});
   const [expandedCards, setExpandedCards] = useState({});
   const [editingCards, setEditingCards] = useState({});
   const [editData, setEditData] = useState({});
@@ -54,25 +55,54 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const profileResponse = await getProfile();
-        setProfile(profileResponse.data);
-        const walletResponse = await getWallet();
-        setWallet(walletResponse.data);
+        // Fetch profile data first
+        let profileData = null;
+        try {
+          const profileResponse = await getProfile();
+          profileData = profileResponse.data;
+          setProfile(profileData);
+        } catch (error) {
+          console.error("❌ Failed to fetch profile data:", error);
+          setErrors(prev => ({ ...prev, profile: "فشل في تحميل بيانات الملف الشخصي" }));
+        }
+
+        // Fetch wallet data
+        try {
+          const walletResponse = await getWallet();
+          setWallet(walletResponse.data);
+        } catch (error) {
+          console.error("❌ Failed to fetch wallet data:", error);
+          setErrors(prev => ({ ...prev, wallet: "فشل في تحميل بيانات المحفظة" }));
+        }
 
         // جلب البيانات حسب الأدوار
-        if (profileResponse.data?.roles?.includes('resident')) {
-          const residentResponse = await getResidentProfileData();
-          setResidentData(residentResponse.data);
+        if (profileData?.roles?.includes('resident')) {
+          try {
+            const residentResponse = await getResidentProfileData();
+            setResidentData(residentResponse.data);
+          } catch (error) {
+            console.error("❌ Failed to fetch resident profile data:", error);
+            setErrors(prev => ({ ...prev, residentData: "فشل في تحميل بيانات السكن" }));
+          }
         }
 
-        if (profileResponse.data?.roles?.includes('union_head')) {
-          const unionHeadResponse = await getUnionHeadProfileData();
-          setUnionHeadData(unionHeadResponse.data);
-          const buildingsData = await getMyBuildings();
-          setBuildings(buildingsData);
+        if (profileData?.roles?.includes('union_head')) {
+          try {
+            const unionHeadResponse = await getUnionHeadProfileData();
+            setUnionHeadData(unionHeadResponse.data);
+          } catch (error) {
+            console.error("❌ Failed to fetch union head profile data:", error);
+            setErrors(prev => ({ ...prev, unionHeadData: "فشل في تحميل بيانات رئيس الاتحاد" }));
+          }
+
+          try {
+            const buildingsData = await getMyBuildings();
+            setBuildings(buildingsData);
+          } catch (error) {
+            console.error("❌ Failed to fetch buildings data:", error);
+            setErrors(prev => ({ ...prev, buildings: "فشل في تحميل بيانات العمارات" }));
+          }
         }
-      } catch (error) {
-        console.error("❌ خطأ في جلب البيانات:", error);
       } finally {
         setLoading(false);
       }
