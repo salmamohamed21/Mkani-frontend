@@ -1,13 +1,7 @@
-# TODO List for Removing Mock Data from Home Page for Union Heads
+# TODO: Add Show Password Toggle to Login Page
 
-## Tasks
-- [x] Remove mock statistics data from the fallback in Home.jsx
-- [x] Remove mock activities data from the fallback in Home.jsx
-- [x] Verify the changes work correctly for union_head users
-
-## Completed Tasks
-- [x] Analyze the Home.jsx file and identify the pending maintenance card
-- [x] Confirm the plan with the user
-- [x] Start the development server to test the changes
-- [x] Remove the pending maintenance card from the statistics grid in Home.jsx
-- [x] Adjust the grid layout from 3 columns to 2 columns for better responsiveness
+- [x] Add state for password visibility toggle
+- [x] Import eye icons (MdVisibility and MdVisibilityOff) from react-icons/md
+- [x] Modify the password input field to include a clickable eye icon that toggles visibility
+- [x] Adjust input padding if necessary to accommodate the icon
+- [x] Test the toggle functionality (dev server running on http://localhost:5174/)

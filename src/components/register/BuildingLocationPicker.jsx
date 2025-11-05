@@ -4,11 +4,19 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
-// أيقونة مخصصة للموقع
+// أيقونة مخصصة للموقع المحدد
 const markerIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
+});
+
+// أيقونة مخصصة لموقع اليوزر الحالي
+const userMarkerIcon = new L.Icon({
+  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  className: "hue-rotate-180", // لتغيير لون الأيقونة إلى أزرق أو شيء مشابه
 });
 
 const LocationMarker = ({ position, setPosition, setAddress, onLocationSelect }) => {
@@ -81,6 +89,7 @@ const fetchCoords = async (manualAddress, setPosition, setAddress, setWarningMes
 
 const BuildingLocationPicker = ({ onLocationSelect, initialAddress = "" }) => {
   const [position, setPosition] = useState(null);
+  const [userPosition, setUserPosition] = useState(null);
   const [address, setAddress] = useState("");
   const [manualAddress, setManualAddress] = useState(initialAddress);
   const [warningMessage, setWarningMessage] = useState("");
@@ -91,11 +100,15 @@ const BuildingLocationPicker = ({ onLocationSelect, initialAddress = "" }) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          const coords = { lat: latitude, lng: longitude };
           setMapCenter([latitude, longitude]);
+          setUserPosition(coords);
+          setPosition(coords);
+          fetchAddress(coords, setAddress, onLocationSelect);
         },
         (error) => {
           console.warn("Geolocation error:", error);
-          // Keep default Cairo center
+          // Keep default Cairo center and no marker
         }
       );
     }
@@ -139,11 +152,16 @@ const BuildingLocationPicker = ({ onLocationSelect, initialAddress = "" }) => {
           center={mapCenter}
           zoom={13}
           style={{ height: '100%', width: '100%', zIndex: 1 }}
+          dragging={true}
+          zoomControl={true}
+          scrollWheelZoom={true}
+          doubleClickZoom={true}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          {userPosition && <Marker position={userPosition} icon={userMarkerIcon} />}
           <LocationMarker
             position={position}
             setPosition={setPosition}

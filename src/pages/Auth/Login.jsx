@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Spinner from "../../components/ui/Spinner";
-import { MdEmail, MdLock, MdLogin } from "react-icons/md";
+import { MdEmail, MdLock, MdLogin, MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
@@ -11,6 +11,7 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleGoogleSuccess = async (credentialResponse) => {
     setError("");
@@ -125,13 +126,20 @@ const Login = () => {
                   <MdLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600 w-5 h-5" />
                   <input
                     name="password"
-                    type="password"
-                    className="w-full border-2 border-blue-300 rounded-xl px-12 py-4 focus:border-blue-400 focus:ring-4 focus:ring-blue-400/20 transition-all duration-300 bg-white text-blue-900 placeholder-blue-500"
+                    type={showPassword ? "text" : "password"}
+                    className="w-full border-2 border-blue-300 rounded-xl px-12 pr-12 py-4 focus:border-blue-400 focus:ring-4 focus:ring-blue-400/20 transition-all duration-300 bg-white text-blue-900 placeholder-blue-500"
                     value={formData.password}
                     onChange={handleChange}
                     required
                     placeholder="أدخل كلمة المرور"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                  >
+                    {showPassword ? <MdVisibilityOff className="w-5 h-5" /> : <MdVisibility className="w-5 h-5" />}
+                  </button>
                 </div>
               </div>
 
