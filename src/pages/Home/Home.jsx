@@ -36,43 +36,15 @@ function Home() {
           setActivities(activitiesResponse.data);
         } catch (error) {
           console.error('Error fetching dashboard data:', error);
-          // Fallback to mock data if API fails
+          // Fallback to empty data if API fails
           setStats({
-            totalBuildings: 5,
-            totalResidents: 120,
-            totalPackages: 15,
-            monthlyRevenue: 25000,
-            pendingMaintenance: 8
+            totalBuildings: 0,
+            totalResidents: 0,
+            totalPackages: 0,
+            monthlyRevenue: 0,
+            pendingMaintenance: 0
           });
-          setActivities([
-            {
-              id: 'mock_1',
-              type: 'payment',
-              title: 'تم دفع فاتورة كهرباء - عمارة الأمل',
-              description: 'مبلغ: 500 ج.م',
-              timestamp: new Date().toISOString(),
-              icon: 'FaCheckCircle',
-              color: 'green'
-            },
-            {
-              id: 'mock_2',
-              type: 'maintenance',
-              title: 'طلب صيانة جديد - شقة 201',
-              description: 'مشكلة في السباكة',
-              timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-              icon: 'FaTools',
-              color: 'orange'
-            },
-            {
-              id: 'mock_3',
-              type: 'resident',
-              title: 'انضمام ساكن جديد - عمارة النخيل',
-              description: 'أحمد محمد',
-              timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-              icon: 'FaUsers',
-              color: 'blue'
-            }
-          ]);
+          setActivities([]);
         } finally {
           setLoading(false);
         }
@@ -139,7 +111,7 @@ function Home() {
           <div className="max-w-7xl mx-auto">
             {/* Statistics Cards with Enhanced Design */}
             {user && user.roles?.includes('union_head') && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                 <Card className="p-8 text-center bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                   <div className="relative">
                     <FaBuilding className="text-4xl text-blue-600 mx-auto mb-4 animate-pulse" />
@@ -159,17 +131,6 @@ function Home() {
                   <p className="text-gray-600 font-medium">عدد السكان</p>
                   <div className="mt-4 flex justify-center">
                     <FaArrowRight className="text-green-400 text-sm" />
-                  </div>
-                </Card>
-
-                <Card className="p-8 text-center bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                  <div className="relative">
-                    <FaTools className="text-4xl text-orange-500 mx-auto mb-4 animate-pulse" />
-                  </div>
-                  <h3 className="text-3xl font-bold text-gray-800 mb-2">{stats.pendingMaintenance}</h3>
-                  <p className="text-gray-600 font-medium">طلبات الصيانة المعلقة</p>
-                  <div className="mt-4 flex justify-center">
-                    <FaArrowRight className="text-orange-400 text-sm" />
                   </div>
                 </Card>
               </div>
