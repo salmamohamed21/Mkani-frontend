@@ -981,8 +981,15 @@ export default function RegisterPage() {
           formData.append('building_id', data.building_id);
           formData.append('building_name', data.building_name);
           formData.append('address', data.address);
+          if (data.resident_type === 'owner') {
+            formData.append('area', data.area);
+            formData.append('rooms_count', data.rooms_count);
+          }
           if (data.resident_type === 'tenant') {
             formData.append('owner_national_id', data.owner_national_id);
+            formData.append('rental_start_date', data.rental_start_date);
+            formData.append('rental_end_date', data.rental_end_date);
+            formData.append('rental_value', data.rental_value);
             formData.append('rental_contract', data.rental_contract);
           }
         }
