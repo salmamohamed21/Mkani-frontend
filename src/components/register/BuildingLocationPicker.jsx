@@ -120,31 +120,14 @@ const BuildingLocationPicker = ({ onLocationSelect, initialAddress = "" }) => {
 
   return (
     <div className="space-y-4 bg-white p-4 rounded-xl shadow-md">
-      <h2 className="text-lg font-semibold text-gray-800 mb-2">
-        📍 حدد موقع العمارة
-      </h2>
+      
 
-      {/* إدخال يدوي للعنوان */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          العنوان يدويًا:
-        </label>
-        <div className="flex">
-          <input
-            type="text"
-            placeholder="اكتب العنوان أو اسم المنطقة..."
-            value={manualAddress}
-            onChange={(e) => setManualAddress(e.target.value)}
-            className="flex-1 border border-gray-300 rounded-l-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-          <button
-            onClick={() => fetchCoords(manualAddress, setPosition, setAddress, setWarningMessage, onLocationSelect)}
-            className="bg-gray-500 text-white px-3 py-2 mr-3 rounded-tr-2xl rounded-bl-2xl hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 flex items-center justify-center transition-colors duration-200"
-          >
-            <MagnifyingGlassIcon className="h-5 w-5" />
-          </button>
+      {/* عرض العنوان المستخرج */}
+      {address && (
+        <div className="bg-blue-50 border border-blue-200 text-blue-800 p-2 rounded-lg text-sm">
+          <strong>العنوان المحدد:</strong> {address}
         </div>
-      </div>
+      )}
 
       {/* خريطة OpenStreetMap */}
       <div className="h-72 rounded-xl overflow-hidden border border-gray-200 relative z-0">
@@ -175,13 +158,6 @@ const BuildingLocationPicker = ({ onLocationSelect, initialAddress = "" }) => {
       {warningMessage && (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-2 rounded-lg text-sm">
           <strong>تحذير:</strong> {warningMessage}
-        </div>
-      )}
-
-      {/* عرض العنوان المستخرج */}
-      {address && (
-        <div className="bg-blue-50 border border-blue-200 text-blue-800 p-2 rounded-lg text-sm">
-          <strong>العنوان المحدد:</strong> {address}
         </div>
       )}
     </div>
