@@ -23,6 +23,9 @@ import AddPackage from './pages/Packages/AddPackage';
 import EditPackage from './pages/Packages/EditPackage';
 import PackageDetails from './pages/Packages/PackageDetails';
 import Wallet from './pages/Payments/Wallet';
+import MyRentalsPage from './pages/MyRentals/MyRentalsPage';
+import RentalsPage from './pages/Rentals/RentalsPage';
+import MaintenancePage from './pages/Maintenance/MaintenancePage';
 
 
 
@@ -34,7 +37,7 @@ import AddProperty from './pages/AddProperty/AddProperty';
 
 export default function RoutesConfig(){
   return (
-    <GoogleOAuthProvider clientId="337224757321-cj3fqn0m12mvir3l4m38cef9jmvlga2k.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <ScrollToTop />
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -56,12 +59,15 @@ export default function RoutesConfig(){
         <Route path="/packages/add" element={<PrivateRoute><AddPackage /></PrivateRoute>} />
         <Route path="/packages/:id/edit" element={<PrivateRoute><EditPackage /></PrivateRoute>} />
         <Route path="/packages/:id" element={<PrivateRoute><PackageDetails /></PrivateRoute>} />
-        <Route path="/payments/wallet" element={<PrivateRoute><Wallet /></PrivateRoute>} />
-
-
-        <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
-        <Route path="/residents" element={<PrivateRoute><Residents /></PrivateRoute>} />
-        <Route path="/buildings/:buildingId/residents/:residentId" element={<PrivateRoute><ResidentDetail /></PrivateRoute>} />
+                <Route path="/payments/wallet" element={<PrivateRoute><Wallet /></PrivateRoute>} />
+                <Route path="/my-rentals" element={<PrivateRoute><MyRentalsPage /></PrivateRoute>} />
+                <Route path="/rentals" element={<PrivateRoute><RentalsPage /></PrivateRoute>} />
+                <Route path="/maintenance" element={<PrivateRoute><MaintenancePage /></PrivateRoute>} />
+        
+        
+                <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
+                <Route path="/residents" element={<PrivateRoute><Residents /></PrivateRoute>} />
+                <Route path="/buildings/:buildingId/residents/:residentId" element={<PrivateRoute><ResidentDetail /></PrivateRoute>} />
 
         <Route path="/add-property" element={<PrivateRoute><AddProperty /></PrivateRoute>} />
         <Route path="*" element={<Home />} />

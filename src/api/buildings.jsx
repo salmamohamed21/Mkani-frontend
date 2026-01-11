@@ -88,3 +88,9 @@ export const updateResidentPresence = async (residentId, isPresent, absenceReaso
   });
   return res.data;
 };
+
+// الوحدات المتاحة في عمارة معينة
+export const getAvailableUnits = async (buildingId) => {
+  const res = await axiosClient.get(`/units/available_units/?building_id=${buildingId}`);
+  return res.data;
+};

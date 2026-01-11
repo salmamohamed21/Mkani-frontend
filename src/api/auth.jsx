@@ -1,7 +1,7 @@
 import axios from "axios";
 import axiosClient from "./axiosClient";
 
-axios.defaults.baseURL = "https://terrific-success-production.up.railway.app/";
+axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true; // ✅ مهم جدًا لتفعيل الكوكيز
 
 export const loginUser = async (email, password) => {
@@ -62,5 +62,20 @@ export const getUnionHeadProfileData = () => axiosClient.get("/api/auth/profile/
 
 export const searchByNationalId = async (nationalId) => {
   const res = await axiosClient.get(`/api/accounts/search-by-national-id/${nationalId}/`);
+  return res.data;
+};
+
+export const searchByPhoneNumber = async (phoneNumber) => {
+  const res = await axiosClient.get(`/api/accounts/search-by-phone-number/${phoneNumber}/`);
+  return res.data;
+};
+
+
+export const addResidentApartment = async (formData) => {
+  const res = await axiosClient.post('/api/accounts/residents/', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return res.data;
 };

@@ -2,25 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Card from "../../components/ui/Card";
-import { FaCoins, FaBuilding, FaUsers, FaTools, FaChartLine, FaCalendarAlt, FaExclamationTriangle, FaMobileAlt, FaArrowRight, FaCheckCircle, FaStar, FaBell, FaBox } from "react-icons/fa";
+import Button from "../../components/ui/Button";
+import { FaCoins, FaBuilding, FaUsers, FaTools, FaChartLine, FaCalendarAlt, FaExclamationTriangle, FaMobileAlt, FaArrowRight, FaCheckCircle, FaStar, FaBell, FaBox, FaEye, FaMapMarkerAlt, FaBed, FaRulerCombined, FaHome, FaMoneyBillWave, FaUser, FaPhone, FaWhatsapp } from "react-icons/fa";
 import homeImg from "../../assets/home.jpg";
 import enrollImg from "../../assets/enroll.png";
 import { dashboardAPI } from "../../api/dashboard";
+import { getRentalListings } from "../../api/rentals.jsx";
 import LoadingPage from "../../components/ui/LoadingPage";
 
-function Home() {
+const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    totalBuildings: 0,
-    totalResidents: 0,
-    totalPackages: 0,
-    monthlyRevenue: 0,
-    pendingMaintenance: 0
-  });
+  const [stats, setStats] = useState({});
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAllActivities, setShowAllActivities] = useState(false);
+  const [rentalListings, setRentalListings] = useState([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -52,6 +49,25 @@ function Home() {
     };
 
     fetchDashboardData();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchRentalListings = async () => {
+      if (user) {
+        try {
+          const response = await getRentalListings();
+          // Get latest 3 listings
+          setRentalListings(response.slice(0, 3));
+        } catch (error) {
+          console.error('Error fetching rental listings:', error);
+          setRentalListings([]);
+        }
+      } else {
+        setRentalListings([]);
+      }
+    };
+
+    fetchRentalListings();
   }, [user]);
 
   return (
@@ -104,6 +120,141 @@ function Home() {
           />
         </div>
       </section>
+
+      {user && (
+        <>
+          {/* Latest Rental Listings Section */}
+          <section className="py-16 px-6 bg-gradient-to-br from-white to-blue-50">
+            <div className="max-w-7xl mx-auto" dir="rtl">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 flex items-center justify-center gap-3">
+                  <FaHome className="text-blue-600" />
+                  أحدث الإعلانات للإيجار
+                </h2>
+                <p className="text-lg text-gray-600">اكتشف أحدث الشقق والوحدات المتاحة للإيجار في مجتمعنا</p>
+              </div>
+
+              {rentalListings.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {rentalListings.map((listing) => {
+                    const ownerName = [listing.owner_details?.first_name, listing.owner_details?.last_name].filter(Boolean).join(" ") || "المالك";
+                    const whatsappNumber = listing.owner_details?.phone_number?.replace(/\D/g, '');
+
+                    return (
+                      <Card key={listing.id} className="flex flex-col p-0 bg-white shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 rounded-2xl overflow-hidden">
+                        <div className="p-5">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="p-3 bg-blue-100 rounded-full">
+                              <FaHome className="text-2xl text-blue-600" />
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold text-gray-800">{listing.building_details?.name}</h3>
+                              <p className="text-xs text-gray-500 flex items-center gap-1">
+                                <FaMapMarkerAlt className="text-red-500" />
+                                {listing.building_details?.address}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3 text-sm text-gray-700 mb-4">
+                            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                              <FaBuilding className="text-blue-600" />
+                              <span>الدور: {listing.unit_details?.floor}</span>
+                            </div>
+                            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                              <FaBuilding className="text-blue-600" />
+                              <span>شقة: {listing.unit_details?.unit_number}</span>
+                            </div>
+                            {listing.unit_details?.area && (
+                              <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                                <FaRulerCombined className="text-green-600" />
+                                <span>{listing.unit_details.area} م²</span>
+                              </div>
+                            )}
+                            {listing.unit_details?.rooms && (
+                              <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                                <FaBed className="text-purple-600" />
+                                <span>{listing.unit_details.rooms} غرف</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {listing.comment && (
+                            <div className="mb-4 p-3 bg-yellow-50 border-r-4 border-yellow-400">
+                              <p className="text-sm text-gray-700 italic">"{listing.comment}"</p>
+                            </div>
+                          )}
+
+                          <div className="border-t pt-4">
+                            <div className="space-y-2">
+                              {listing.monthly_price && (
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm text-gray-600">الإيجار الشهري:</span>
+                                  <span className="font-bold text-lg text-green-600">{listing.monthly_price} جنيه</span>
+                                </div>
+                              )}
+                              {listing.daily_price && (
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm text-gray-600">اليومي:</span>
+                                  <span className="font-semibold text-blue-600">{listing.daily_price} جنيه</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-gray-50 p-4 mt-auto">
+                           <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <FaUser className="text-gray-500" />
+                              <span className="font-semibold text-gray-800">{ownerName}</span>
+                            </div>
+                            <div className="text-xs text-gray-500" dir="ltr">
+                              {listing.owner_details?.phone_number}
+                            </div>
+                          </div>
+                          
+                          {whatsappNumber ? (
+                            <a
+                              href={`https://wa.me/${whatsappNumber}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                            >
+                              <FaWhatsapp className="text-xl" />
+                              تواصل مع المالك
+                            </a>
+                          ) : (
+                             <div className="text-center text-sm text-gray-500">
+                                (لا يتوفر رقم للتواصل)
+                             </div>
+                          )}
+                        </div>
+                      </Card>
+                    )
+                  })}
+                  <Card className="flex flex-col items-center justify-center p-6 bg-gray-50 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 rounded-2xl">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4">هل تبحث عن المزيد؟</h3>
+                    <p className="text-gray-600 mb-6 text-center">تصفح جميع إعلانات الإيجار المتاحة للعثور على ما يناسبك.</p>
+                    <Button
+                      onClick={() => navigate('/rentals')}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                    >
+                      <FaEye className="text-xl" />
+                      عرض المزيد
+                    </Button>
+                  </Card>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <FaHome className="text-6xl text-gray-300 mx-auto mb-4" />
+                  <p className="text-xl text-gray-500">لا توجد إعلانات إيجار حالياً</p>
+                </div>
+              )}
+            </div>
+          </section>
+        </>
+      )}
 
       {user ? (
         // Dashboard for authenticated users (union heads)

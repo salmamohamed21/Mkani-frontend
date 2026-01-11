@@ -1,10 +1,12 @@
 import axios from "axios";
 
-axios.defaults.baseURL = "https://terrific-success-production.up.railway.app/";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+
+axios.defaults.baseURL = API_BASE_URL;
 axios.defaults.withCredentials = true; // ✅ مهم جدًا
 
 const axiosInstance = axios.create({
-  baseURL: "https://terrific-success-production.up.railway.app/",
+  baseURL: API_BASE_URL,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });

@@ -30,3 +30,33 @@ export function getMyBuildings() {
       return [];
     });
 }
+
+export function updateBuilding(id, data) {
+  return axiosInstance
+    .put(`api/buildings/${id}/`, data)
+    .then((response) => response.data)
+    .catch((error) => {
+      console.error("Error updating building:", error);
+      throw error;
+    });
+}
+
+export function getAvailableUnits(buildingId) {
+  return axiosInstance
+    .get(`api/buildings/units/available_units/?building_id=${buildingId}`)
+    .then((response) => response.data)
+    .catch((error) => {
+      console.error("Error fetching available units:", error);
+      return [];
+    });
+}
+
+export function updateApartment(unitId, data) {
+  return axiosInstance
+    .patch(`api/buildings/units/${unitId}/`, data)
+    .then((response) => response.data)
+    .catch((error) => {
+      console.error("Error updating apartment:", error);
+      throw error;
+    });
+}

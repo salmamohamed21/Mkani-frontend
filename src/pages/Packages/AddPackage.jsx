@@ -601,12 +601,12 @@ const AddPackage = () => {
         buildings: selectedBuildings
       };
       await addPackage(dataToSend);
+      setLoading(false);
       alert('تم إضافة الباقة بنجاح');
       navigate("/packages");
     } catch (error) {
       console.error("Error adding package:", error);
       alert('حدث خطأ في إضافة الباقة');
-    } finally {
       setLoading(false);
     }
   };

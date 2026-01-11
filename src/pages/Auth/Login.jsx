@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Spinner from "../../components/ui/Spinner";
 import { MdEmail, MdLock, MdLogin, MdVisibility, MdVisibilityOff } from "react-icons/md";
@@ -12,6 +12,14 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('session_expired')) {
+      setError("انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى.");
+    }
+  }, [location.search]);
 
   const handleGoogleSuccess = async (credentialResponse) => {
     setError("");

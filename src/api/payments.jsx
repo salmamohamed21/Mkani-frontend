@@ -22,3 +22,8 @@ export const initiateTopUp = (data) => axiosClient.post("payments/topups/", data
 export const getTransactions = () => axiosClient.get("payments/transactions/");
 export const getUnpaidInvoices = () => axiosClient.get("packages/invoices/unpaid/");
 export const payInvoice = (id) => axiosClient.post(`packages/invoices/${id}/pay/`);
+
+export const payRent = async (data) => {
+  const res = await axiosClient.post("payments/rent/pay/", data);
+  return res.data;
+};
